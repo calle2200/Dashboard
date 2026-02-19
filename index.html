@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT-Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css" />
+
+    <!-- Firebase SDK (compat-versioner för enkel syntax) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container">
+            <h1>Dashboard</h1>
+        </div>
+    </header>
+
+
+    <main>
+        <section class="left-grid" aria-label="Rutor 2×5">
+            <section class="device-card status status--ledig" data-device-id="1" aria-labelledby="dator-1">
+                <h2 id="dator-1" class="device-name">PC1</h2>
+                <div class="device-info">
+                    <div class="row"><span class="label">Status:</span><span class="value js-status">Ledig</span></div>
+                    <div class="row actions">
+                        <button class="btn js-loan">Låna ut</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="device-card status status--ledig" data-device-id="2" aria-labelledby="dator-2">
+                <h2 id="dator-1" class="device-name">PC2</h2>
+                <div class="device-info">
+                    <div class="row"><span class="label">Status:</span><span class="value js-status">Ledig</span></div>
+                    <div class="row actions">
+                        <button class="btn js-loan">Låna ut</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="device-card status status--ledig" data-device-id="3" aria-labelledby="dator-3">
+                <h2 id="dator-1" class="device-name">PC3</h2>
+                <div class="device-info">
+                    <div class="row"><span class="label">Status:</span><span class="value js-status">Ledig</span></div>
+                    <div class="row actions">
+                        <button class="btn js-loan">Låna ut</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="device-card status status--ledig" data-device-id="4" aria-labelledby="dator-4">
+                <h2 id="dator-1" class="device-name">PC4</h2>
+                <div class="device-info">
+                    <div class="row"><span class="label">Status:</span><span class="value js-status">Ledig</span></div>
+                    <div class="row actions">
+                        <button class="btn js-loan">Låna ut</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="device-card status status--ledig" data-device-id="5" aria-labelledby="dator-5">
+                <h2 id="dator-1" class="device-name">PC5</h2>
+                <div class="device-info">
+                    <div class="row"><span class="label">Status:</span><span class="value js-status">Ledig</span></div>
+                    <div class="row actions">
+                        <button class="btn js-loan">Låna ut</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="device-card status status--ledig" data-device-id="6" aria-labelledby="dator-6">
+                <h2 id="dator-1" class="device-name">PC6</h2>
+                <div class="device-info">
+                    <div class="row"><span class="label">Status:</span><span class="value js-status">Ledig</span></div>
+                    <div class="row actions">
+                        <button class="btn js-loan">Låna ut</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="device-card status status--ledig" data-device-id="7" aria-labelledby="dator-7">
+                <h2 id="dator-1" class="device-name">PC7</h2>
+                <div class="device-info">
+                    <div class="row"><span class="label">Status:</span><span class="value js-status">Ledig</span></div>
+                    <div class="row actions">
+                        <button class="btn js-loan">Låna ut</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="device-card status status--ledig" data-device-id="8" aria-labelledby="dator-8">
+                <h2 id="dator-1" class="device-name">PC8</h2>
+                <div class="device-info">
+                    <div class="row"><span class="label">Status:</span><span class="value js-status">Ledig</span></div>
+                    <div class="row actions">
+                        <button class="btn js-loan">Låna ut</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="device-card status status--ledig" data-device-id="9" aria-labelledby="dator-9">
+                <h2 id="dator-1" class="device-name">PC9</h2>
+                <div class="device-info">
+                    <div class="row"><span class="label">Status:</span><span class="value js-status">Ledig</span></div>
+                    <div class="row actions">
+                        <button class="btn js-loan">Låna ut</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="device-card status status--ledig" data-device-id="10" aria-labelledby="dator-10">
+                <h2 id="dator-1" class="device-name">PC10</h2>
+                <div class="device-info">
+                    <div class="row"><span class="label">Status:</span><span class="value js-status">Ledig</span></div>
+                    <div class="row actions">
+                        <button class="btn js-loan">Låna ut</button>
+                    </div>
+                </div>
+            </section>
+
+        </section>
+
+        <aside class="right-panel" aria-label="Tom högersida">
+            <div class="todo-app">
+                <h2>Att göra:</h2>
+                <div class="rad">
+                    <input type="text" id="input-box" placeholder="Skriv här">
+                    <button class="btn" id="right-btn" onclick="addTask()">Lägg till</button>
+                </div>
+
+            </div>
+            <ul id="list-container">
+                <!--<li class="checked">Task 1</li>
+                <li>Task 2</li>
+                <li>Task 3</li> -->
+            </ul>
+        </aside>
+    </main>
+
+    <!--Popup för Utlångingen-->
+    <dialog id="loanDialog" class="dialog">
+        <form method="dialog" id="loanForm" class="dialog__panel" aria-labelledby="dialog-title">
+            <h3 id="dialog-title">Låna ut dator</h3>
+            <label class="field">
+                <span class="field__label">Låntagare</span>
+                <input id="borrowerInput" class="field__control" type="text" placeholder="Skriv in namn" required />
+            </label>
+
+            <label class="field">
+                <span class="field__label">Förväntat returdatum</span>
+                <input id="returnDate" class="field__control" type="date" lang="sv" required />
+            </label>
+
+            <div class="dialog__actions">
+                <button value="cancel" class="btn btn--ghost" formnovalidate>Avbryt</button>
+                <button value="confirm" class="btn">Bekräfta utlåning</button>
+            </div>
+        </form>
+    </dialog>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>© 2025 IT Dashboard • MSA</p>
+            <p>Version 1.0</p>
+        </div>
+    </footer>
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>
