@@ -33,6 +33,7 @@ const noReturnDateCheckbox = document.getElementById('noReturnDate');
 
 let activeCard = null;
 
+
 // Sätt min-datum till idag
 const todayISO = new Date().toISOString().slice(0, 10);
 returnDateInput.min = todayISO;
@@ -323,3 +324,4 @@ db.ref("todos").on("value", (snapshot) => {
     const todos = snapshot.val();
     applyTodosState(todos || []);
 });
+
