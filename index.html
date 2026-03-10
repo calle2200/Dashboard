@@ -152,7 +152,15 @@
 
             <label class="field">
                 <span class="field__label">Förväntat returdatum</span>
-                <input id="returnDate" class="field__control" type="date" lang="sv" required />
+
+                <div class="date-inline">
+                    <input id="returnDate" class="field__control" type="date" lang="sv" />
+
+                    <label class="inline-check">
+                        <input id="noReturnDate" type="checkbox" />
+                        <span>Ingen deadline</span>
+                    </label>
+                </div>
             </label>
 
             <div class="dialog__actions">
@@ -164,13 +172,12 @@
 
     <footer class="site-footer">
         <div class="container">
-            <p>© 2026 IT Dashboard • MSA</p>
-            <p>Version 1.1</p>
+            <p>© 2025 IT Dashboard • MSA</p>
+            <p>Version 1.0</p>
         </div>
     </footer>
 
     <script src="dashboard.js"></script>
 </body>
-
 
 </html>
