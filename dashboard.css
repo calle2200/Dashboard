@@ -363,3 +363,33 @@ ul li span:hover {
     filter: invert(50%) sepia(100%) saturate(1000%) hue-rotate(180deg);
     cursor: pointer;
 }
+
+.date-inline {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.date-inline .field__control {
+    flex: 0 0 40px; /* lagom bredd på datum */
+}
+
+.inline-check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.inline-check input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--brand);
+}
+
+#returnDate:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
