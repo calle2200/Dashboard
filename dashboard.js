@@ -29,12 +29,24 @@ const dialog = document.getElementById("loanDialog");
 const form = document.getElementById('loanForm');
 const borrowerInput = document.getElementById("borrowerInput");
 const returnDateInput = document.getElementById('returnDate');
+const noReturnDateCheckbox = document.getElementById('noReturnDate');
 
 let activeCard = null;
 
 // Sätt min-datum till idag
 const todayISO = new Date().toISOString().slice(0, 10);
 returnDateInput.min = todayISO;
+
+// "Inget returdatum" - toggle
+function syncNoReturnDateUI() {
+    const noDate = noReturnDateCheckbox && noReturnDateCheckbox.checked;
+    returnDateInput.disabled = !!noDate;
+    if (noDate) returnDateInput.value = '';
+}
+if (noReturnDateCheckbox) {
+    noReturnDateCheckbox.addEventListener('change', syncNoReturnDateUI);
+    syncNoReturnDateUI();
+}
 
 // Flagga: ignorera nästa Firebase-uppdatering om vi just sparade själva
 let ignoreNextDevices = false;
@@ -90,7 +102,8 @@ function buildDevicesState() {
             const borrowerEl = card.querySelector('.js-borrower');
             const dateEl = card.querySelector('.js-date');
             deviceState.borrower = borrowerEl ? borrowerEl.textContent.trim() : "";
-            deviceState.date = dateEl ? dateEl.childNodes[0].textContent.trim() : "";
+            // tar bara första text-noden (innan badge) om den finns
+            deviceState.date = dateEl ? (dateEl.childNodes[0] ? dateEl.childNodes[0].textContent.trim() : dateEl.textContent.trim()) : "";
         }
 
         devices[id] = deviceState;
@@ -157,6 +170,11 @@ document.querySelectorAll('.js-loan').forEach(btn => {
         activeCard = e.currentTarget.closest('.device-card');
         borrowerInput.value = '';
         returnDateInput.value = '';
+        if (noReturnDateCheckbox) {
+            noReturnDateCheckbox.checked = false;
+            syncNoReturnDateUI();
+        }
+
         if (typeof dialog.showModal === 'function') {
             dialog.showModal();
         } else {
@@ -182,6 +200,10 @@ function closeDialog() {
     if (dialog.open) dialog.close();
     borrowerInput.value = '';
     returnDateInput.value = '';
+    if (noReturnDateCheckbox) {
+        noReturnDateCheckbox.checked = false;
+        syncNoReturnDateUI();
+    }
 }
 
 form.addEventListener('submit', (e) => {
@@ -192,11 +214,14 @@ form.addEventListener('submit', (e) => {
         return;
     }
 
-    const borrower = borrowerInput.value;
-    const date = returnDateInput.value;
-    if (!activeCard || !borrower || !date) return;
+    const borrower = borrowerInput.value.trim();
+    const noDate = noReturnDateCheckbox ? noReturnDateCheckbox.checked : false;
+    const date = returnDateInput.value; // "" om inget valt
 
-    markAsLent(activeCard, borrower, date);
+    if (!activeCard || !borrower) return;
+    if (!noDate && !date) return; // måste välja datum om man inte kryssat i "ingen"
+
+    markAsLent(activeCard, borrower, noDate ? '' : date);
 });
 
 function markAsLent(card, borrower, dateStr, noSave) {
@@ -215,11 +240,16 @@ function markAsLent(card, borrower, dateStr, noSave) {
 </div>
 `;
 
-    const dueClass = getDueClass(dateStr);
-    info.querySelector('.js-date').innerHTML = `
+    const dateEl = info.querySelector('.js-date');
+    if (dateStr) {
+        const dueClass = getDueClass(dateStr);
+        dateEl.innerHTML = `
 ${dateStr}
 <span class="badge due ${dueClass}" title="Deadline-status"></span>
 `;
+    } else {
+        dateEl.textContent = '—'; // eller "Ingen"
+    }
 
     info.querySelector('.js-borrower').textContent = borrower;
 
@@ -248,6 +278,11 @@ function markAsReturned(card, noSave) {
         activeCard = e.currentTarget.closest('.device-card');
         borrowerInput.value = '';
         returnDateInput.value = '';
+        if (noReturnDateCheckbox) {
+            noReturnDateCheckbox.checked = false;
+            syncNoReturnDateUI();
+        }
+
         if (typeof dialog.showModal === 'function') {
             dialog.showModal();
         } else {
