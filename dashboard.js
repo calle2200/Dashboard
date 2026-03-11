@@ -33,7 +33,6 @@ const noReturnDateCheckbox = document.getElementById('noReturnDate');
 
 let activeCard = null;
 
-
 // Sätt min-datum till idag
 const todayISO = new Date().toISOString().slice(0, 10);
 returnDateInput.min = todayISO;
@@ -325,3 +324,268 @@ db.ref("todos").on("value", (snapshot) => {
     applyTodosState(todos || []);
 });
 
+/* ============================
+   KALENDER + EVENTS (Firebase)
+   - klick på dag => popup (titel + beskrivning)
+   - render titel i kalendern
+   - hover visar beskrivning
+   - delete-knapp (×) tar bort och synkar via Firebase
+   ============================ */
+(() => {
+    const calRoot = document.getElementById("calendar");
+    if (!calRoot) return;
+
+    // Dialog för event
+    const eventDialog = document.getElementById("eventDialog");
+    const eventForm = document.getElementById("eventForm");
+    const eventDateLabel = document.getElementById("eventDateLabel");
+    const eventTitleInput = document.getElementById("eventTitle");
+    const eventDescInput = document.getElementById("eventDesc");
+
+    const state = {
+        viewDate: new Date(),
+        selectedDate: null,
+        // eventsByDate: { "YYYY-MM-DD": { "<pushId>": {title, description, createdAt} } }
+        eventsByDate: {}
+    };
+
+    let pendingDateKey = null;
+    let ignoreNextCalendarEvents = false;
+
+    const pad2 = (n) => String(n).padStart(2, "0");
+    const isoKey = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+
+    const sameDay = (a, b) =>
+        a && b &&
+        a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate();
+
+    const startOfMonth = (d) => new Date(d.getFullYear(), d.getMonth(), 1);
+    const endOfMonth = (d) => new Date(d.getFullYear(), d.getMonth() + 1, 0);
+    const mondayIndex = (jsDayIndex) => (jsDayIndex + 6) % 7;
+
+    const fmtMonthYear = (d) => d.toLocaleDateString("sv-SE", { month: "long", year: "numeric" });
+    const fmtLong = (d) => d.toLocaleDateString("sv-SE", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+
+    function capitalize(s) {
+        return s ? (s.charAt(0).toUpperCase() + s.slice(1)) : s;
+    }
+
+    const monthLabel = document.getElementById("monthLabel");
+    const rangeLabel = document.getElementById("rangeLabel");
+    const selectedLabel = document.getElementById("selectedLabel");
+    const dowRow = document.getElementById("dowRow");
+    const daysGrid = document.getElementById("daysGrid");
+
+    document.getElementById("prevBtn").addEventListener("click", () => {
+        state.viewDate = new Date(state.viewDate.getFullYear(), state.viewDate.getMonth() - 1, 1);
+        render();
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", () => {
+        state.viewDate = new Date(state.viewDate.getFullYear(), state.viewDate.getMonth() + 1, 1);
+        render();
+    });
+
+    document.getElementById("todayBtn").addEventListener("click", () => {
+        state.viewDate = new Date();
+        state.selectedDate = new Date();
+        render();
+    });
+
+    const weekDaysSv = ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"];
+
+    function renderDow() {
+        dowRow.innerHTML = "";
+        for (const name of weekDaysSv) {
+            const el = document.createElement("div");
+            el.className = "dow";
+            el.textContent = name;
+            dowRow.appendChild(el);
+        }
+    }
+
+    function openEventDialog(dateObj) {
+        // skydd om någon dialog-del saknas
+        if (!eventDialog || !eventForm || !eventDateLabel || !eventTitleInput || !eventDescInput) {
+            alert("Event-dialogen saknas i HTML eller fel id:n (eventDialog/eventForm/eventDateLabel/eventTitle/eventDesc).");
+            return;
+        }
+
+        pendingDateKey = isoKey(dateObj);
+        state.selectedDate = dateObj;
+
+        eventDateLabel.textContent = fmtLong(dateObj);
+        eventTitleInput.value = "";
+        eventDescInput.value = "";
+
+        if (typeof eventDialog.showModal === "function") eventDialog.showModal();
+        else eventDialog.setAttribute("open", "");
+    }
+
+    function closeEventDialog() {
+        if (eventDialog && eventDialog.open) eventDialog.close();
+        pendingDateKey = null;
+    }
+
+    // Submit: spara event
+    if (eventForm) {
+        eventForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const submitter = e.submitter && e.submitter.getAttribute("value");
+            if (submitter === "cancel") {
+                closeEventDialog();
+                return;
+            }
+
+            const title = (eventTitleInput?.value || "").trim();
+            const description = (eventDescInput?.value || "").trim();
+            if (!pendingDateKey || !title) return;
+
+            const eventObj = {
+                title,
+                description,
+                createdAt: Date.now()
+            };
+
+            ignoreNextCalendarEvents = true;
+
+            db.ref("calendarEvents")
+                .child(pendingDateKey)
+                .push(eventObj)
+                .then(() => {
+                    closeEventDialog();
+                })
+                .catch((err) => {
+                    console.error("Kunde inte spara kalender-event:", err);
+                    ignoreNextCalendarEvents = false;
+                });
+        });
+    }
+
+    function renderDays() {
+        daysGrid.innerHTML = "";
+
+        const today = new Date();
+        const first = startOfMonth(state.viewDate);
+        const last = endOfMonth(state.viewDate);
+
+        const leading = mondayIndex(first.getDay());
+        const gridStart = new Date(first);
+        gridStart.setDate(first.getDate() - leading);
+
+        const totalCells = 42;
+
+        for (let i = 0; i < totalCells; i++) {
+            const d = new Date(gridStart);
+            d.setDate(gridStart.getDate() + i);
+
+            const key = isoKey(d);
+
+            const cell = document.createElement("div");
+            cell.className = "day";
+            cell.dataset.date = key;
+
+            const num = document.createElement("div");
+            num.className = "num";
+            num.textContent = d.getDate();
+            cell.appendChild(num);
+
+            if (d.getMonth() !== state.viewDate.getMonth()) cell.classList.add("is-outside");
+            if (sameDay(d, today)) cell.classList.add("is-today");
+
+            if (sameDay(d, state.selectedDate)) {
+                cell.style.outline = "1px solid rgba(255,255,255,.18)";
+                cell.style.boxShadow = "inset 0 0 0 1px rgba(124,196,255,.28)";
+            }
+
+            // Hämta events med id
+            const dayEventsObj = state.eventsByDate[key] || {};
+            const dayEvents = Object.entries(dayEventsObj); // [ [eventId, eventData], ... ]
+
+            if (dayEvents.length) {
+                const eventsWrap = document.createElement("div");
+                eventsWrap.className = "events";
+
+                for (const [eventId, ev] of dayEvents
+                    .slice()
+                    .sort((a, b) => ((a[1].createdAt || 0) - (b[1].createdAt || 0)))
+                    .slice(0, 3)) {
+
+                    const tag = document.createElement("div");
+                    tag.className = "event";
+
+                    // hover = beskrivning
+                    if (ev.description) tag.title = ev.description;
+
+                    // titel
+                    const titleSpan = document.createElement("span");
+                    titleSpan.className = "event__title";
+                    titleSpan.textContent = ev.title || "(utan titel)";
+                    tag.appendChild(titleSpan);
+
+                    // delete-knapp
+                    const delBtn = document.createElement("button");
+                    delBtn.type = "button";
+                    delBtn.className = "event__del";
+                    delBtn.textContent = "×";
+                    delBtn.title = "Ta bort";
+
+                    delBtn.addEventListener("click", (e) => {
+                        e.stopPropagation(); // hindra dag-klick
+                        const ok = confirm(`Ta bort "${ev.title}"?`);
+                        if (!ok) return;
+
+                        db.ref("calendarEvents")
+                            .child(key)
+                            .child(eventId)
+                            .remove()
+                            .catch(err => console.error("Kunde inte ta bort event:", err));
+                    });
+
+                    tag.appendChild(delBtn);
+
+                    // klick på event-taggen ska inte öppna dialog för dagen
+                    tag.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                    });
+
+                    eventsWrap.appendChild(tag);
+                }
+
+                cell.appendChild(eventsWrap);
+            }
+
+            // Klick på dag: välj + öppna popup
+            cell.addEventListener("click", () => {
+                state.selectedDate = d;
+                if (selectedLabel) selectedLabel.textContent = fmtLong(d);
+                openEventDialog(d);
+                render();
+            });
+
+            daysGrid.appendChild(cell);
+        }
+
+        if (monthLabel) monthLabel.textContent = capitalize(fmtMonthYear(state.viewDate));
+        if (rangeLabel) rangeLabel.textContent = `${first.toLocaleDateString("sv-SE")} – ${last.toLocaleDateString("sv-SE")}`;
+        if (selectedLabel) selectedLabel.textContent = state.selectedDate ? fmtLong(state.selectedDate) : "Ingen dag vald";
+    }
+
+    function render() {
+        renderDow();
+        renderDays();
+    }
+
+    // Firebase: realtime sync av kalender-events
+    db.ref("calendarEvents").on("value", (snapshot) => {
+        if (ignoreNextCalendarEvents) {
+            ignoreNextCalendarEvents = false;
+        }
+        state.eventsByDate = snapshot.val() || {};
+        render();
+    });
+
+    render();
+})();
