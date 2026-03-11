@@ -24,7 +24,6 @@ body {
     height: 100%;
 }
 
-
 body {
     margin: 0;
     font-family: Roboto, Inter, Arial, sans-serif;
@@ -32,19 +31,15 @@ body {
     background: radial-gradient(1200px 800px at 10% -10%, #132038 0%, transparent 60%),
         radial-gradient(1200px 800px at 120% 10%, #101826 0%, transparent 55%),
         var(--bg);
-    /* Hel-sideslayout: header / innehåll / footer */
-    /*min-height: 100svh;*/
     display: grid;
     grid-template-rows: auto 1fr auto;
 }
-
 
 .site-header,
 .site-footer {
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
 }
-
 
 .site-header {
     background: linear-gradient(180deg, rgba(124, 196, 255, .08), transparent 80%);
@@ -85,16 +80,13 @@ body {
 }
 
 main {
-    /* Två lika breda kolumner i mitten */
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 66px;
     padding: 16px;
-
     width: 100%;
     margin: 0 auto;
 }
-
 
 /* Vänster: 2 kolumner × 5 rader = 10 rutor */
 .left-grid {
@@ -104,9 +96,10 @@ main {
     gap: 12px;
     padding-left: 80px;
     height: 100%;
+
 }
 
-
+/* ===== Device cards (orörd) ===== */
 .device-card {
     position: relative;
     background: linear-gradient(180deg, var(--panel) 0%, var(--panel-alt) 100%);
@@ -117,7 +110,6 @@ main {
     box-shadow: var(--shadow);
     min-height: 80px;
     max-width: 400px;
-    /* säkerhetslinje om raderna får krympa */
 }
 
 .device-name {
@@ -131,7 +123,6 @@ main {
     grid-template-columns: 140px 1fr;
     gap: 1px 4px;
     align-items: center;
-
     padding-right: 100px;
 }
 
@@ -179,6 +170,7 @@ main {
     background: linear-gradient(180deg, #fc6767, #ed2424);
 }
 
+/* Buttons */
 .btn {
     appearance: none;
     border: 1px solid var(--border);
@@ -209,28 +201,48 @@ main {
     font-size: 13px;
 }
 
-/* Höger: tom yta (visuell markering bara för att visa ytan) */
+/* ===== HÖGERPANEL: delas i två halvor ===== */
 .right-panel {
     background: linear-gradient(180deg, var(--panel) 0%, var(--panel-alt) 100%);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     min-height: 200px;
-    /* kan tas bort */
+
+    /* NYTT */
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    height: calc(100vh - 160px);
+    /* ungefär: header + padding */
 }
 
+/* två "kort" som tar halva höjden var */
+.right-card {
+    background: rgba(0, 0, 0, .10);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    flex: 1 1 0;
+    min-height: 0;
+    /* viktigt för scroll i barn */
+}
+
+/* Todo */
 .todo-app {
     width: 100%;
+    height: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
     flex-direction: column;
+    padding: 14px;
 }
 
 .todo-app h2 {
     color: var(--text);
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    margin: 0 0 12px;
 }
 
 .rad {
@@ -242,10 +254,12 @@ main {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding-left: 20px;
-    margin-bottom: 25px;
+    margin-bottom: 12px;
 }
 
-input {
+/* Begränsa din gamla input-styling till text/date så checkbox inte pajjar */
+input[type="text"],
+input[type="date"] {
     flex: 1;
     border: none;
     outline: none;
@@ -254,6 +268,38 @@ input {
     padding: 10px;
 }
 
+ul#list-container {
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    min-height: 0;
+}
+
+#list-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+#list-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, .03);
+    border-left: 1px solid rgba(255, 255, 255, .06);
+    border-radius: 999px;
+}
+
+#list-container::-webkit-scrollbar-thumb {
+    background: rgba(124, 196, 255, .25);
+    border: 2px solid rgba(0, 0, 0, 0);
+    /* ger “luft” */
+    background-clip: padding-box;
+    border-radius: 999px;
+}
+
+#list-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(124, 196, 255, .38);
+    border: 2px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+}
+
+/* todo items */
 ul li {
     list-style: none;
     font-size: 17px;
@@ -303,6 +349,7 @@ ul li span:hover {
     background: var(--bg);
 }
 
+/* ===== Dialog ===== */
 .dialog {
     border: none;
     padding: 0;
@@ -334,7 +381,6 @@ ul li span:hover {
     margin-top: 12px;
 }
 
-
 .field {
     display: grid;
     gap: 6px;
@@ -355,16 +401,7 @@ ul li span:hover {
     color: var(--text);
 }
 
-#returnDate {
-    color: transparent;
-    width: 9%;
-}
-
-#returnDate::-webkit-calendar-picker-indicator {
-    filter: invert(50%) sepia(100%) saturate(1000%) hue-rotate(180deg);
-    cursor: pointer;
-}
-
+/* Datum + checkbox inline i dialogen */
 .date-inline {
     display: flex;
     align-items: center;
@@ -372,7 +409,7 @@ ul li span:hover {
 }
 
 .date-inline .field__control {
-    flex: 0 0 40px; /* lagom bredd på datum */
+    flex: 0 0 190px;
 }
 
 .inline-check {
@@ -385,8 +422,12 @@ ul li span:hover {
 }
 
 .inline-check input[type="checkbox"] {
+    flex: 0 0 auto;
+    padding: 0;
     width: 16px;
     height: 16px;
+    appearance: auto;
+    -webkit-appearance: auto;
     accent-color: var(--brand);
 }
 
@@ -395,3 +436,237 @@ ul li span:hover {
     cursor: not-allowed;
 }
 
+#returnDate::-webkit-calendar-picker-indicator {
+    filter: invert(50%) sepia(100%) saturate(1000%) hue-rotate(180deg);
+    cursor: pointer;
+}
+
+/* ===== Kalender (anpassad till dina variabler) ===== */
+.calendar {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .03));
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 14px;
+    background: rgba(0, 0, 0, .18);
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+
+.cal-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.cal-title h1 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: .2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cal-title small {
+    color: var(--muted);
+}
+
+.cal-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.cal-btn {
+    appearance: none;
+    border: 1px solid rgba(255, 255, 255, .10);
+    background: rgba(255, 255, 255, .04);
+    color: var(--text);
+    padding: 9px 11px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.cal-btn:hover {
+    filter: brightness(1.08);
+}
+
+.cal-btn:active {
+    transform: translateY(1px);
+}
+
+.cal-btn--primary {
+    border-color: rgba(124, 196, 255, .45);
+    background: rgba(124, 196, 255, .14);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.dow {
+    padding: 8px 10px;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    background: rgba(0, 0, 0, .10);
+}
+
+#daysGrid {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.day {
+    min-height: 74px;
+    padding: 8px 8px 10px;
+    border-right: 1px solid rgba(255, 255, 255, .08);
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    position: relative;
+    background: rgba(255, 255, 255, .02);
+    transition: background .15s ease;
+}
+
+.day:nth-child(7n) {
+    border-right: none;
+}
+
+.day:hover {
+    background: rgba(255, 255, 255, .06);
+}
+
+.day .num {
+    font-size: 12px;
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+}
+
+.day.is-today .num {
+    color: var(--text);
+    background: rgba(124, 196, 255, .18);
+    outline: 1px solid rgba(124, 196, 255, .35);
+}
+
+.day.is-outside {
+    background: rgba(255, 255, 255, .01);
+    color: rgba(230, 237, 243, .55);
+}
+
+.day.is-outside .num {
+    color: rgba(152, 162, 179, .65);
+}
+
+.events {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 54px;
+    overflow: hidden;
+}
+
+.event {
+    font-size: 12px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, .10);
+    background: rgba(255, 255, 255, .04);
+    color: var(--text);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.todo-card {
+    flex: 1 1 0;
+}
+
+.calendar-card {
+    flex: 2 1 0;
+}
+
+.event-date {
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: .92rem;
+}
+
+.event{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.event__title{
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.event__del{
+  appearance: none;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+  color: var(--text);
+  width: 22px;
+  height: 22px;
+  border-radius: 8px;
+  line-height: 18px;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.event__del:hover{
+  background: rgba(239,68,68,.18);
+  border-color: rgba(239,68,68,.35);
+}
+
+/* textarea ska matcha inputs */
+.field__control textarea,
+textarea.field__control {
+    resize: vertical;
+    min-height: 96px;
+}
+
+@media (max-width: 900px) {
+    main {
+        grid-template-columns: 1fr;
+    }
+
+    .left-grid {
+        padding-left: 0;
+    }
+
+    .right-panel {
+        height: auto;
+    }
+
+    .right-card {
+        min-height: 320px;
+    }
+}
