@@ -19,6 +19,7 @@
         </div>
     </header>
 
+
     <main>
         <section class="left-grid" aria-label="Rutor 2×5">
             <section class="device-card status status--ledig" data-device-id="1" aria-labelledby="dator-1">
@@ -123,21 +124,50 @@
 
         </section>
 
-        <aside class="right-panel" aria-label="Tom högersida">
-            <div class="todo-app">
-                <h2>Att göra:</h2>
-                <div class="rad">
-                    <input type="text" id="input-box" placeholder="Skriv här">
-                    <button class="btn" id="right-btn" onclick="addTask()">Lägg till</button>
-                </div>
+        <section class="right-panel">
 
+            <!-- Todo-kort -->
+            <div class="right-card todo-card">
+                <div class="todo-app">
+                    <h2>To do</h2>
+
+                    <div class="rad">
+                        <input id="input-box" type="text" placeholder="Skriv en uppgift..." />
+                        <button class="btn" id="right-btn" onclick="addTask()">Lägg till</button>
+                    </div>
+
+                    <ul id="list-container"></ul>
+                </div>
             </div>
-            <ul id="list-container">
-                <!--<li class="checked">Task 1</li>
-                <li>Task 2</li>
-                <li>Task 3</li> -->
-            </ul>
-        </aside>
+
+            <!-- Kalender-kort -->
+            <div class="right-card calendar-card">
+                <div class="calendar" id="calendar">
+                    <header class="cal-header">
+                        <div class="cal-title">
+                            <h1 id="monthLabel">—</h1>
+                            <small id="rangeLabel">—</small>
+                        </div>
+
+                        <div class="cal-actions">
+                            <button class="cal-btn" id="prevBtn" aria-label="Föregående månad">‹</button>
+                            <button class="cal-btn cal-btn--primary" id="todayBtn">Idag</button>
+                            <button class="cal-btn" id="nextBtn" aria-label="Nästa månad">›</button>
+                        </div>
+                    </header>
+
+                    <div class="grid" id="dowRow"></div>
+                    <div class="grid" id="daysGrid"></div>
+
+                    <footer class="cal-footer">
+                        <span></span>
+                        <span id="selectedLabel"></span>
+                    </footer>
+
+                </div>
+            </div>
+
+        </section>
     </main>
 
     <!--Popup för Utlångingen-->
@@ -169,10 +199,34 @@
         </form>
     </dialog>
 
+    <dialog id="eventDialog" class="dialog">
+        <form method="dialog" id="eventForm" class="dialog__panel" aria-labelledby="event-dialog-title">
+            <h3 id="event-dialog-title">Lägg till kalenderhändelse</h3>
+
+            <p class="event-date" id="eventDateLabel">—</p>
+
+            <label class="field">
+                <span class="field__label">Titel</span>
+                <input id="eventTitle" class="field__control" type="text" placeholder="Ex: Retur av dator" required />
+            </label>
+
+            <label class="field">
+                <span class="field__label">Beskrivning</span>
+                <textarea id="eventDesc" class="field__control" rows="4"
+                    placeholder="Skriv en kort beskrivning..."></textarea>
+            </label>
+
+            <div class="dialog__actions">
+                <button value="cancel" class="btn btn--ghost" formnovalidate>Avbryt</button>
+                <button value="confirm" class="btn">Spara</button>
+            </div>
+        </form>
+    </dialog>
+
     <footer class="site-footer">
         <div class="container">
             <p>© 2026 IT Dashboard • MSA</p>
-            <p>Version 1.2</p>
+            <p>Version 1.3</p>
         </div>
     </footer>
 
@@ -180,5 +234,3 @@
 </body>
 
 </html>
-
-
